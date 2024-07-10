@@ -1,0 +1,62 @@
+syntax = "proto3";
+package ProtobufGen;
+
+//下发手牌变化
+message ResHandCards{
+    int32 reqCode = 1; //手牌变化类型（1 减少 2 增加）
+    repeated int32 handCards = 2; //变化的手牌
+}
+
+//下发叫地主座次（一人只能叫一次）
+message ResWillCallBossSeat{
+    int32 willCallBossSeat = 1; //将要叫地主座次
+}
+
+//请求叫地主或不叫地主
+message ReqCallBoss{
+    int32 reqCode = 1; //叫地主或不叫（1 叫地主 2 不叫）
+}
+
+//下发叫地主或不叫地主
+message ResCallBoss{
+    int32 seat = 1; //请求的玩家的座次
+    int32 resCode = 2; //叫地主或不叫（1 叫地主 2 不叫）
+    int32 bossSeat = 3; //地主座次，未确定为-1
+}
+
+
+//下发底牌
+message ResHoldCard{
+    repeated int32 holeCards = 1; //底牌
+}
+
+//下发出牌座次
+message ResPushSeat{
+    int32 seat = 1; //座次
+}
+
+//请求出牌
+message ReqPushCard{
+    repeated int32 pushCards = 2; //出的牌
+}
+
+//下发出牌
+message ResPushCard{
+    int32 seat = 1; //出牌的座次
+    repeated int32 pushCards = 3; //出的牌
+}
+
+//请求不出
+message ReqPassCard{
+
+}
+
+//下发不出
+message ResPassCard{
+    int32 seat = 1; //不出的座次
+}
+
+//下发游戏结束
+message ResGameOver{
+    
+}

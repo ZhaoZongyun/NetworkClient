@@ -1,0 +1,7 @@
+syntax = "proto3";
+package ProtobufGen;
+
+//下发错误提示
+message ResErrorNotice{
+    string errorNotice = 1; //提示内容
+}

@@ -1,0 +1,34 @@
+syntax = "proto3";
+package ProtobufGen;
+
+//请求角色信息
+message ReqCharacterInfo{
+
+}
+
+//下发角色信息
+message ResCharacterInfo{
+    int32 resCode  = 1; //返回码（0 成功 1 角色不存在）
+    CharacterBean characterBean = 2; //角色，返回码为0时有效
+}
+
+//请求创建角色
+message ReqCreateCharacter{
+    string nickname = 1; //昵称
+    int32 sex = 2; //角色性别（1 男 2 女）
+}
+
+//下发创建角色
+message ResCreateCharacter{
+    int32 resCode  = 1; //返回码（0 成功 1 昵称不合法 2 昵称已存在）
+    CharacterBean characterBean = 2; //角色实体
+}
+
+//角色bean
+message CharacterBean{
+    int64 userId = 1; //用户id
+    string nickname = 2; //昵称
+    int32 sex = 3; //角色性别（1 男 2 女）
+    int32 beanNum = 4; //欢乐豆数量
+    int32 level = 8; //等级
+}
