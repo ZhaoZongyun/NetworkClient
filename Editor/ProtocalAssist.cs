@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
-using System.Threading;
 using UnityEditor;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -12,40 +10,6 @@ using Debug = UnityEngine.Debug;
 /// </summary>
 public class ProtocalAssist
 {
-    [MenuItem("proto/生成proto代码")]
-    public static void RunBat()
-    {
-        string fileName = Application.dataPath + "/Network/Protobuf/Tool/protoGen.bat";
-        Thread thread = new Thread(delegate ()
-        {
-            var info = new ProcessStartInfo();
-            info.FileName = fileName;
-            info.CreateNoWindow = false;
-            info.UseShellExecute = false;
-            info.RedirectStandardInput = false;
-            info.RedirectStandardError = true;
-            info.RedirectStandardOutput = true;
-
-            info.StandardErrorEncoding = Encoding.GetEncoding("GB2312");
-            info.StandardOutputEncoding = Encoding.GetEncoding("GB2312");
-            Process.Start(info);
-
-            //using (var myProcess = Process.Start(info))
-            //{
-            //    var output = myProcess.StandardOutput.ReadToEnd();
-            //    Debug.Log(output); // 输出标准输出的内容
-            //    var err = myProcess.StandardError.ReadToEnd();
-            //    Debug.Log(err); // 输出标准错误的内容
-
-            //    myProcess.WaitForExit();
-
-            //    var exitCode = myProcess.ExitCode;
-            //    Debug.Log($"Process Exit Code {exitCode}");
-            //}
-        });
-        thread.Start();
-    }
-
     [MenuItem("proto/生成NetModule代码")]
     public static void GenNetModuleCode()
     {
