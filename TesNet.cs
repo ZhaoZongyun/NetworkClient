@@ -23,7 +23,7 @@ public class TesNet : HTBehaviour
     }
 
     /// <summary>
-    /// 接收到服务器下发注册信息
+    /// 向服务器请求注册
     /// </summary>
     /// <param name="message"></param>
     private void OnResRegister(IMessage message)
@@ -44,7 +44,7 @@ public class TesNet : HTBehaviour
     }
 
     /// <summary>
-    /// 接收到服务器下发登录信息
+    /// 向服务器请求登录
     /// </summary>
     /// <param name="message"></param>
     private void OnResLogin(IMessage message)
