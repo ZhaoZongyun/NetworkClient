@@ -3,7 +3,7 @@
 2. 运行 Networ/Protobuf/Tool 目录中的 protoGen.bat 文件，会根据 proto 文件生成对应的 c# 代码
     （1）在 window 目录下双击允许，直接在 Unity 中双击无效
 3. 运行 Unity 菜单中的 proto/生成NetModule代码
-4. 需要收发消息时，按如下示例使用：
+4. 需要收发消息时，按如下示例使用，可参考 TesNet.cs 脚本
 
     public void Test()
     {
