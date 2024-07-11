@@ -81,6 +81,7 @@ public partial class NetModule : CustomModuleBase
     {
         base.OnTerminate();
 
+        Log.Info("退出 NetModule");
         if (udpClient != null)
             udpClient.Close();
         if (thread != null)
