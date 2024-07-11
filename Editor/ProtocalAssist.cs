@@ -16,10 +16,10 @@ public class ProtocalAssist
         string protoPath = Application.dataPath + "/Network/Protobuf/ProtoFiles";
 
         string clientMessageIdFile = Application.dataPath + "/Network/NetMessageId.cs";
-        string serverMessageIdFile = "E:/CSharpProject/TestUDPServer/Struct/NetMessageId.cs";
+        //string serverMessageIdFile = "E:/CSharpProject/TestUDPServer/Struct/NetMessageId.cs";
 
         string clientNetMgrFile = Application.dataPath + "/Network/NetModuleGen.cs";
-        string serverNetMgrFile = "E:/CSharpProject/TestUDPServer/Mgr/NetMgrGen.cs";
+        //string serverNetMgrFile = "E:/CSharpProject/TestUDPServer/Mgr/NetMgrGen.cs";
 
         if (!File.Exists(clientMessageIdFile))
         {
@@ -27,12 +27,13 @@ public class ProtocalAssist
             Directory.CreateDirectory(dir);
             File.Create(clientMessageIdFile);
         }
-        if (!File.Exists(serverMessageIdFile))
-        {
-            string dir = Path.GetDirectoryName(serverMessageIdFile);
-            Directory.CreateDirectory(dir);
-            File.Create(serverMessageIdFile);
-        }
+
+        //if (!File.Exists(serverMessageIdFile))
+        //{
+        //    string dir = Path.GetDirectoryName(serverMessageIdFile);
+        //    Directory.CreateDirectory(dir);
+        //    File.Create(serverMessageIdFile);
+        //}
 
         if (!File.Exists(clientNetMgrFile))
         {
@@ -40,12 +41,13 @@ public class ProtocalAssist
             Directory.CreateDirectory(dir);
             File.Create(clientNetMgrFile);
         }
-        if (!File.Exists(serverNetMgrFile))
-        {
-            string dir = Path.GetDirectoryName(serverNetMgrFile);
-            Directory.CreateDirectory(dir);
-            File.Create(serverNetMgrFile);
-        }
+
+        //if (!File.Exists(serverNetMgrFile))
+        //{
+        //    string dir = Path.GetDirectoryName(serverNetMgrFile);
+        //    Directory.CreateDirectory(dir);
+        //    File.Create(serverNetMgrFile);
+        //}
 
         List<Message> list = new List<Message>();
         List<Message> reqlist = new List<Message>();
@@ -149,12 +151,14 @@ public class ProtocalAssist
 
         File.WriteAllText(clientMessageIdFile, messageIdSb.ToString());
 
+        /*
         StringBuilder tempSb = new StringBuilder();
         tempSb.AppendLine("namespace TestUDPServer");
         tempSb.AppendLine("{");
         messageIdSb.Insert(0, tempSb.ToString());
         messageIdSb.AppendLine("}");
         File.WriteAllText(serverMessageIdFile, messageIdSb.ToString());
+        */
 
         Debug.Log("NetMessageId.cs完成，消息数：" + list.Count + " 上发数：" + reqlist.Count + " 下发数：" + reslist.Count);
 
@@ -235,9 +239,10 @@ public class ProtocalAssist
         netMgrSb.AppendLine("    }");
         netMgrSb.AppendLine("}");
         File.WriteAllText(clientNetMgrFile, netMgrSb.ToString());
+        netMgrSb.Clear();
 
         //服务器 NetMgrGen.cs
-        netMgrSb.Clear();
+        /*
         netMgrSb.AppendLine("using Google.Protobuf;");
         netMgrSb.AppendLine("using System.Collections.Generic;");
         netMgrSb.AppendLine();
@@ -313,6 +318,7 @@ public class ProtocalAssist
         netMgrSb.AppendLine("    }");
         netMgrSb.AppendLine("}");
         File.WriteAllText(serverNetMgrFile, netMgrSb.ToString());
+        */
 
         Debug.Log("NetMgrGen.cs完成");
     }
