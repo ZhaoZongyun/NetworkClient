@@ -1,8 +1,10 @@
-﻿using HT.Framework;
+using HT.Framework;
 using System.Linq;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading;
+using System;
+using Debug = UnityEngine.Debug;
 
 /// <summary>
 /// 网络模块
@@ -29,6 +31,7 @@ public partial class NetModuleUDP : CustomModuleBase
     private UdpClient udpClient;
     private IPEndPoint endPoint;
     private Thread thread;
+    private AsyncCallback callback;
 
     public override void OnInit()
     {
@@ -38,13 +41,33 @@ public partial class NetModuleUDP : CustomModuleBase
     public override void OnReady()
     {
         base.OnReady();
+    }
 
+    public void Setup()
+    {
+        Debug.Log("UDP 初始化 发起连接");
         udpClient = new UdpClient(22000);   //绑定一个端口
         endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), port);  //接收远程ip和端口的数据
 
-        //开启一个线程接收服务器消息，否则主线程卡死
+        // 接收消息，方式一，异步调用 + 尾递归
+        callback = new AsyncCallback(ReceiveCallback);
+        udpClient.BeginReceive(callback, null);
+        
+        // 接收消息，方式二，线程阻塞
+        // 开启一个线程接收服务器消息，否则主线程卡死
         thread = new Thread(new ThreadStart(Receive));
         thread.Start();
+    }
+
+    private void ReceiveCallback(IAsyncResult ar)
+    {
+        if (ar.IsCompleted)
+        {
+            byte[] bytes = udpClient.EndReceive(ar, ref endPoint);
+            string message = System.Text.Encoding.UTF8.GetString(bytes);
+            Log.Info("从服务器接收到消息：" + message);
+            udpClient.BeginReceive(callback, null);
+        }
     }
 
     //接收
@@ -61,7 +84,7 @@ public partial class NetModuleUDP : CustomModuleBase
     }
 
     /// <summary>
-    /// 发送网络消息
+    /// 发送消息
     /// </summary>
     public void Send(string message)
     {
