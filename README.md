@@ -4,9 +4,9 @@
 （2）方式二，线程阻塞
 #### 2. 两种消息发送方式：(TCP)
 （1）方式一，用 NetworkStream
-（2）方式二，用 TcpClient.Client.Send（Socket）
+（2）方式二，用 TcpClient.Client.Send (内部为 Socket)
 #### 3. UDP 消息发送：
-UdpClient.Send
+UdpClient.Send (内部为 Socket)
 ### UDP_Protobuf 分支：支持UDP消息收发和Protobuf解析、封装消息
 ### Protobuf ：
 1. Protobuf 版本为 v3.12.0
