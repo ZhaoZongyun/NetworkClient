@@ -1,11 +1,11 @@
-### UDP_TCP 分支：支持UDP和TCP消息收发
-#### 1. 两种消息接收方式：（TCP/UDP）
+### UDP_TCP 分支：UDP和TCP消息收发
+#### 1. 消息接收方式：（TCP或UDP）
 （1）方式一，异步调用 + 尾递归
 （2）方式二，线程阻塞
-#### 2. 两种消息发送方式：(TCP)
+#### 2. TCP 消息发送方式：
 （1）方式一，用 NetworkStream
 （2）方式二，用 TcpClient.Client.Send (内部为 Socket)
-#### 3. UDP 消息发送：
+#### 3. UDP 消息发送方式：
 UdpClient.Send (内部为 Socket)
 ### UDP_Protobuf 分支：支持UDP消息收发和Protobuf解析、封装消息
 ### Protobuf ：
