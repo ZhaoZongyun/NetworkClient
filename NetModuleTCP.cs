@@ -1,61 +1,34 @@
-﻿using HT.Framework;
-using System.Linq;
 using System.Net.Sockets;
 using System.Net;
-using Debug = UnityEngine.Debug;
 using System;
 using System.Threading;
 
 /// <summary>
 /// 网络模块
 /// </summary>
-[CustomModule("NetModuleTCP", true)]
-public partial class NetModuleTCP : CustomModuleBase
+public class NetModuleTCP
 {
-    private static NetModuleTCP _instance;
-    public static NetModuleTCP Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = Main.m_CustomModule["NetModuleTCP"].Cast<NetModuleTCP>();
-            }
-
-            return _instance;
-        }
-    }
-
-    private TcpClient tcpClient;
-    private IPEndPoint endPoint;
+    private TcpClient cient;
     private NetworkStream stream;
     private byte[] receiveBuffer;
     private Thread thread;
 
-    public override void OnInit()
+    public void Setup()
     {
-        base.OnInit();
-    }
-
-    public override void OnReady()
-    {
-        base.OnReady();
-
-        tcpClient = new TcpClient();
+        Console.WriteLine("发起连接");
+        cient = new TcpClient();
         receiveBuffer = new byte[1024];
-        Debug.Log("发起连接");
 
-        tcpClient.BeginConnect(IPAddress.Parse("192.168.0.33"), 11000, ConnectCallback, tcpClient);
+        cient.BeginConnect(IPAddress.Parse(Const.serverIp), Const.tcp_serverPort, ConnectCallback, cient);
     }
 
     private void ConnectCallback(IAsyncResult ar)
     {
         try
         {
-            tcpClient.EndConnect(ar);
-            Debug.Log("连接服务器成功");
-            stream = tcpClient.GetStream();
-
+            cient.EndConnect(ar);
+            Console.WriteLine("连接服务器成功");
+            stream = cient.GetStream();
 
             // 接收消息，方式一，异步调用 + 尾递归
             Receive();
@@ -66,7 +39,7 @@ public partial class NetModuleTCP : CustomModuleBase
         }
         catch (Exception ex)
         {
-            Debug.Log("连接服务器异常：" + ex.Message);
+            Console.WriteLine("连接服务器异常：" + ex.Message);
         }
     }
 
@@ -79,7 +52,7 @@ public partial class NetModuleTCP : CustomModuleBase
     {
         int length = stream.EndRead(ar);
         string message = System.Text.Encoding.UTF8.GetString(receiveBuffer, 0, length);
-        Debug.Log($"从服务器接收到消息：" + message);
+        Console.WriteLine($"从服务器接收到消息：" + message);
 
         // 尾递归
         Receive();
@@ -90,12 +63,12 @@ public partial class NetModuleTCP : CustomModuleBase
     {
         while (true)
         {
-            int length = tcpClient.Available;
-            if (tcpClient.Connected && length > 0)
+            int length = cient.Available;
+            if (cient.Connected && length > 0)
             {
                 stream.Read(receiveBuffer, 0, length);
                 string message = System.Text.Encoding.UTF8.GetString(receiveBuffer, 0, length);
-                Debug.Log($"从服务器接收到消息：" + message);
+                Console.WriteLine($"从服务器接收到消息：" + message);
             }
         }
     }
@@ -115,14 +88,13 @@ public partial class NetModuleTCP : CustomModuleBase
 
     public void Disconnect()
     {
-        if (tcpClient != null)
-            tcpClient.Close();
+        if (cient != null)
+            cient.Close();
     }
 
-    public override void OnTerminate()
+    public void Close()
     {
-        base.OnTerminate();
-        Log.Info("退出 NetModuleTCP");
+        Console.WriteLine("关闭 TCP");
 
         if (thread != null)
         {
@@ -134,10 +106,10 @@ public partial class NetModuleTCP : CustomModuleBase
             stream.Close();
             stream = null;
         }
-        if (tcpClient != null)
+        if (cient != null)
         {
-            tcpClient.Close();
-            tcpClient = null;
+            cient.Close();
+            cient = null;
         }
     }
 }
