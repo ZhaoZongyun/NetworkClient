@@ -1,58 +1,36 @@
-using HT.Framework;
 using System.Linq;
 using System.Net.Sockets;
 using System.Net;
 using System.Threading;
 using System;
-using Debug = UnityEngine.Debug;
+using System.Collections.Generic;
 
 /// <summary>
 /// 网络模块
+///     若服务器和客户端在一台电脑，客户端绑定的端口不能与服务器相同，否则端口被占用报错
 /// </summary>
-[CustomModule("NetModuleUDP", true)]
-public partial class NetModuleUDP : CustomModuleBase
+public class NetModuleUDP
 {
-    private static NetModuleUDP _instance;
-    public static NetModuleUDP Instance
-    {
-        get
-        {
-            if (_instance == null)
-            {
-                _instance = Main.m_CustomModule["NetModuleUDP"].Cast<NetModuleUDP>();
-            }
+    private IPEndPoint receivePoint;
+    private IPEndPoint sendPoint;
+    private UdpClient client;
 
-            return _instance;
-        }
-    }
-
-    //服务器端口
-    private const int port = 11000; //服务器和客户端在一台电脑，客户端绑定的端口不能与服务器相同，否则端口被占用报错
-    private UdpClient udpClient;
-    private IPEndPoint endPoint;
     private Thread thread;
-    private AsyncCallback callback;
 
-    public override void OnInit()
-    {
-        base.OnInit();
-    }
-
-    public override void OnReady()
-    {
-        base.OnReady();
-    }
+    private Queue<string> messageQueue;
 
     public void Setup()
     {
-        Debug.Log("UDP 初始化 发起连接");
-        udpClient = new UdpClient(22000);   //绑定一个端口
-        endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), port);  //接收远程ip和端口的数据
+        // UDP 初始化
+        messageQueue = new Queue<string>();
+
+        receivePoint = new IPEndPoint(IPAddress.Any, Const.udp_serverPort);
+        sendPoint = new IPEndPoint(IPAddress.Parse(Const.serverIp), Const.udp_clientPort);
+        client = new UdpClient(receivePoint);
 
         // 接收消息，方式一，异步调用 + 尾递归
-        callback = new AsyncCallback(ReceiveCallback);
-        udpClient.BeginReceive(callback, null);
-        
+        client.BeginReceive(ReceiveCallback, null);
+
         // 接收消息，方式二，线程阻塞
         // 开启一个线程接收服务器消息，否则主线程卡死
         thread = new Thread(new ThreadStart(Receive));
@@ -63,10 +41,12 @@ public partial class NetModuleUDP : CustomModuleBase
     {
         if (ar.IsCompleted)
         {
-            byte[] bytes = udpClient.EndReceive(ar, ref endPoint);
+            byte[] bytes = client.EndReceive(ar, ref receivePoint);
             string message = System.Text.Encoding.UTF8.GetString(bytes);
-            Log.Info("从服务器接收到消息：" + message);
-            udpClient.BeginReceive(callback, null);
+            Console.WriteLine("UPD 接收到消息：" + message);
+            messageQueue.Enqueue(message);
+
+            client.BeginReceive(ReceiveCallback, null);
         }
     }
 
@@ -75,11 +55,12 @@ public partial class NetModuleUDP : CustomModuleBase
     {
         while (true)
         {
-            byte[] bytes = udpClient.Receive(ref endPoint);
+            byte[] bytes = client.Receive(ref receivePoint);
 
             // 将接收到的消息解析为字符串，为坐标数据，例如 10,15;20;30
             string message = System.Text.Encoding.UTF8.GetString(bytes);
-            Log.Info("从服务器接收到消息：" + message);
+            Console.WriteLine("从服务器接收到消息：" + message);
+            messageQueue.Enqueue(message);
         }
     }
 
@@ -89,17 +70,17 @@ public partial class NetModuleUDP : CustomModuleBase
     public void Send(string message)
     {
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(message);
-        udpClient.Send(bytes, bytes.Length, endPoint);
+        client.Send(bytes, bytes.Length, sendPoint);
     }
 
-    public override void OnTerminate()
+    public void Close()
     {
-        base.OnTerminate();
+        Console.WriteLine("关闭 UDP");
 
-        Log.Info("退出 NetModuleUDP");
+        if (client != null)
+            client.Close();
+
         if (thread != null)
             thread.Abort();
-        if (udpClient != null)
-            udpClient.Close();
     }
 }
