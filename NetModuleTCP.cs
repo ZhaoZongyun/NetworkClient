@@ -19,7 +19,11 @@ public class NetModuleTCP
         cient = new TcpClient();
         receiveBuffer = new byte[1024];
 
+        // 发起连接，方式一，APM
         cient.BeginConnect(IPAddress.Parse(Const.serverIp), Const.tcp_serverPort, ConnectCallback, cient);
+
+        // 发起连接，方式二，TAP
+        // await Connect();
     }
 
     private void ConnectCallback(IAsyncResult ar)
@@ -41,6 +45,17 @@ public class NetModuleTCP
         {
             Console.WriteLine("连接服务器异常：" + ex.Message);
         }
+    }
+
+    async Task Connect()
+    {
+        await tcpClient.ConnectAsync(IPAddress.Parse("192.168.0.11"), 11000);
+        Console.WriteLine("连接服务器成功");
+
+        // 接收消息，方式三，TAP
+        stream = tcpClient.GetStream();
+        // 启动接收数据的任务
+        var receiveTask = ReceiveDataAsync(stream);
     }
 
     void Receive()
@@ -73,9 +88,35 @@ public class NetModuleTCP
         }
     }
 
+    async Task ReceiveDataAsync(NetworkStream stream)
+    {
+        try
+        {
+            while (true)
+            {
+                int bytesRead = await stream.ReadAsync(receiveBuffer, 0, receiveBuffer.Length);
+                if (bytesRead == 0)
+                {
+                    Console.WriteLine("服务器关闭连接");
+                    break;
+                }
+
+                string received = Encoding.UTF8.GetString(receiveBuffer, 0, bytesRead);
+                Console.WriteLine("收到：" + received);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("接收异常：" + ex.Message);
+        }
+    }
+    
     // 发送
     public void Send(string message)
     {
+        if (stream == null)
+            return;
+        
         byte[] sendBytes = System.Text.Encoding.UTF8.GetBytes(message);
 
         // 发送方式一，用 NetworkStream
