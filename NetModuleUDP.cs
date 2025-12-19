@@ -11,8 +11,8 @@ using System.Collections.Generic;
 /// </summary>
 public class NetModuleUDP
 {
-    private IPEndPoint receivePoint;
-    private IPEndPoint sendPoint;
+    private IPEndPoint clientPoint;
+    private IPEndPoint serverPoint;
     private UdpClient client;
 
     private Thread thread;
@@ -24,9 +24,9 @@ public class NetModuleUDP
         // UDP 初始化
         messageQueue = new Queue<string>();
 
-        receivePoint = new IPEndPoint(IPAddress.Any, Const.udp_serverPort);
-        sendPoint = new IPEndPoint(IPAddress.Parse(Const.serverIp), Const.udp_clientPort);
-        client = new UdpClient(receivePoint);
+        clientPoint = new IPEndPoint(IPAddress.Any, Const.udp_clientPort);
+        serverPoint = new IPEndPoint(IPAddress.Parse(Const.serverIp), Const.udp_serverPort);
+        client = new UdpClient(clientPoint);
 
         // 接收消息，方式一，异步调用 + 尾递归
         client.BeginReceive(ReceiveCallback, null);
@@ -70,7 +70,7 @@ public class NetModuleUDP
     public void Send(string message)
     {
         byte[] bytes = System.Text.Encoding.UTF8.GetBytes(message);
-        client.Send(bytes, bytes.Length, sendPoint);
+        client.Send(bytes, bytes.Length, serverPoint);
     }
 
     public void Close()
